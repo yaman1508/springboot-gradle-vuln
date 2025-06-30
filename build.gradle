@@ -54,7 +54,7 @@ dependencyCheck {
     formats = ['XML', 'JSON'] // Only supported formats
     failBuildOnCVSS = 0       // Don't fail build on CVSS (for demo)
     autoUpdate = true
-    cveValidForHours = 24
+   // cveValidForHours = 24
 
     analyzers {
         assemblyEnabled = false
