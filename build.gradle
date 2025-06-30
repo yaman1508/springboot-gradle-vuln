@@ -4,7 +4,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.sonarqube' version '4.4.1.3373'
-    id 'org.owasp.dependencycheck' version '12.1.0' // ✅ Updated to latest version
+    id 'org.owasp.dependencycheck' version '12.1.0'
 }
 
 group = 'com.sjprogramming.restapi'
@@ -17,22 +17,19 @@ repositories {
 }
 
 dependencies {
-    // ✅ Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    
-    // ✅ VULNERABLE DEPENDENCIES (for scanning only)
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'              // Log4Shell
-    implementation 'commons-collections:commons-collections:3.2.1'           // Deserialization
-    implementation 'org.apache.struts:struts2-core:2.5.20'                   // Struts RCE
-    
-    // ✅ Runtime & Dev
+
+    // Vulnerable libraries (for demo / scan purposes)
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+    implementation 'commons-collections:commons-collections:3.2.1'
+    implementation 'org.apache.struts:struts2-core:2.5.20'
+
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
-    
-    // ✅ Testing
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -53,28 +50,12 @@ jacocoTestReport {
     }
 }
 
-// ✅ OWASP Dependency Check - FIXED Configuration
 dependencyCheck {
-    // Solution 1: Use only XML format to avoid HTML template issues
-    formats = ['XML', 'JSON'] // Avoid HTML format that's causing the NPE
-    
-    // Solution 2: Alternative - if you need HTML, try with suppressions
-    // formats = ['ALL']
-    // suppressionFile = 'owasp-suppressions.xml'
-    
-    // Enhanced configuration
-    failBuildOnCVSS = 0 // Don't fail build on vulnerabilities (for demo purposes)
-    
-    // Additional stability settings
-    skipTestScope = false
-    skipProvidedScope = false
-    skipRuntimeScope = false
-    
-    // Database settings for better reliability
+    formats = ['XML', 'JSON'] // Only supported formats
+    failBuildOnCVSS = 0       // Don't fail build on CVSS (for demo)
     autoUpdate = true
     cveValidForHours = 24
-    
-    // Analyzers configuration
+
     analyzers {
         assemblyEnabled = false
         nuspecEnabled = false
@@ -88,25 +69,18 @@ dependencyCheck {
         autoconfEnabled = false
         composerEnabled = false
         nodeEnabled = false
-        nodeAuditEnabled = false // ✅ Disable problematic Node audit
-        retirejs = [
-            enabled: false
-        ]
+        nodeAuditEnabled = false
+        retirejs = [enabled: false]
     }
 }
 
-// SonarQube config - FIXED
 sonarqube {
     properties {
         property "sonar.projectKey", "springboot-gradle-vuln"
         property "sonar.projectName", "springboot-gradle-vuln"
         property "sonar.host.url", "http://localhost:9000"
         property "sonar.login", "squ_2ec5731f7c966cf7e363e21b7c6af125841807eb"
-        property "sonar.gradle.skipCompile", "true" // ✅ Already set correctly
-        
-        // ✅ Updated paths for XML format
+        property "sonar.gradle.skipCompile", "true"
         property "sonar.dependencyCheck.reportPath", "build/reports/dependency-check-report.xml"
-        // Remove HTML path since we're not generating HTML to avoid the NPE
-        // property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
 }
