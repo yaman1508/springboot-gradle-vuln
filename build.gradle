@@ -56,7 +56,7 @@ jacocoTestReport {
 // OWASP Dependency Check
 dependencyCheck {
     format = 'ALL'
-    suppressionFile = 'owasp-suppressions.xml'
+    // suppressionFile = 'owasp-suppressions.xml'
     failBuildOnCVSS = 0
 }
 
