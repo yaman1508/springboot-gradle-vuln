@@ -20,27 +20,18 @@ dependencies {
     // Spring Boot dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // ✅ Required for JavaTimeModule
 
-    // VULNERABLE DEPENDENCIES - For testing/scanning only
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.1' // Log4Shell
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3' // Known CVEs
-    implementation 'commons-collections:commons-collections:3.2.1' // Deserialization CVE
-    implementation 'org.apache.struts:struts2-core:2.5.20' // CVEs
+    // VULNERABLE DEPENDENCIES - for OWASP scanning only
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+    implementation 'commons-collections:commons-collections:3.2.1'
+    implementation 'org.apache.struts:struts2-core:2.5.20'
 
-    // NOTE: DO NOT use old spring-core that conflicts with Spring Boot 3.x
-    // If needed for scanning only, use compileOnly:
-    // compileOnly 'org.springframework:spring-core:5.3.8'
-
-    // Database
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
-
-    // Dev tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-    // Servlet API
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 
-    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
