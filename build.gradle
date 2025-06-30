@@ -4,7 +4,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.sonarqube' version '4.4.1.3373'
-    id 'org.owasp.dependencycheck' version '8.4.0' // Add OWASP dependency check
+    id 'org.owasp.dependencycheck' version '8.4.0'
 }
 
 group = 'com.sjprogramming.restapi'
@@ -17,23 +17,31 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    
-    // VULNERABLE DEPENDENCIES - For testing purposes only
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.1' // Vulnerable to Log4Shell
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3' // Known vulnerabilities
-    implementation 'org.springframework:spring-core:5.3.8' // Older version with vulnerabilities
-    implementation 'commons-collections:commons-collections:3.2.1' // Deserialization vulnerability
-    implementation 'org.apache.struts:struts2-core:2.5.20' // Known Struts vulnerabilities
-    
-    // Regular dependencies
+
+    // VULNERABLE DEPENDENCIES - For testing/scanning only
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1' // Log4Shell
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3' // Known CVEs
+    implementation 'commons-collections:commons-collections:3.2.1' // Deserialization CVE
+    implementation 'org.apache.struts:struts2-core:2.5.20' // CVEs
+
+    // NOTE: DO NOT use old spring-core that conflicts with Spring Boot 3.x
+    // If needed for scanning only, use compileOnly:
+    // compileOnly 'org.springframework:spring-core:5.3.8'
+
+    // Database
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
+
+    // Dev tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    
-    // Add servlet API for HttpServletResponse
+
+    // Servlet API
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
@@ -49,11 +57,18 @@ jacocoTestReport {
     }
 }
 
+// Force compatible Spring version in case of conflict
+configurations.all {
+    resolutionStrategy {
+        force 'org.springframework:spring-core:6.1.6'
+    }
+}
+
 // OWASP Dependency Check Configuration
 dependencyCheck {
     format = 'ALL'
     suppressionFile = 'owasp-suppressions.xml'
-    failBuildOnCVSS = 0 // Set to 0 to not fail build, just report
+    failBuildOnCVSS = 0 // Prevent pipeline failure, only report
 }
 
 sonarqube {
@@ -62,6 +77,7 @@ sonarqube {
         property "sonar.projectName", "springboot-gradle-vuln"
         property "sonar.host.url", "http://localhost:9000"
         property "sonar.login", "squ_2ec5731f7c966cf7e363e21b7c6af125841807eb"
+        property "sonar.gradle.skipCompile", "true" // Avoid deprecation warnings
         property "sonar.dependencyCheck.reportPath", "build/reports/dependency-check-report.xml"
         property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
