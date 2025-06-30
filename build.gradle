@@ -17,24 +17,22 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot dependencies
+    // ✅ Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // ✅ Fix for JavaTimeModule
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // Fix for LocalDate/JavaTimeModule
 
-    // VULNERABLE DEPENDENCIES - For scanning only, avoid runtime usage
-    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
-    implementation 'commons-collections:commons-collections:3.2.1'
-    implementation 'org.apache.struts:struts2-core:2.5.20'
-    // DO NOT include old spring-core version — it breaks Spring Boot 3.x
+    // ✅ VULNERABLE DEPENDENCIES (for scanning only)
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'              // Log4Shell
+    implementation 'commons-collections:commons-collections:3.2.1'           // Deserialization
+    implementation 'org.apache.struts:struts2-core:2.5.20'                   // Struts RCE
 
-    // Database and dev
+    // ✅ Runtime & Dev
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 
-    // Test
+    // ✅ Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -44,7 +42,7 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.8.10" // ✅ Recommended version for Gradle 8.13+
+    toolVersion = "0.8.10" // Safe for Gradle 8.13+
 }
 
 jacocoTestReport {
@@ -55,27 +53,21 @@ jacocoTestReport {
     }
 }
 
-// Force Spring compatibility if needed (not required unless conflict occurs)
-configurations.all {
-    resolutionStrategy {
-        force 'org.springframework:spring-core:6.1.6'
-    }
-}
-
-// OWASP Dependency Check Configuration
+// OWASP Dependency Check
 dependencyCheck {
     format = 'ALL'
     suppressionFile = 'owasp-suppressions.xml'
-    failBuildOnCVSS = 0 // Don't fail build, just report
+    failBuildOnCVSS = 0
 }
 
+// SonarQube config
 sonarqube {
     properties {
         property "sonar.projectKey", "springboot-gradle-vuln"
         property "sonar.projectName", "springboot-gradle-vuln"
         property "sonar.host.url", "http://localhost:9000"
         property "sonar.login", "squ_2ec5731f7c966cf7e363e21b7c6af125841807eb"
-        property "sonar.gradle.skipCompile", "true" // ✅ Avoid deprecated compile behavior
+        property "sonar.gradle.skipCompile", "true"
         property "sonar.dependencyCheck.reportPath", "build/reports/dependency-check-report.xml"
         property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
