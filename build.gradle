@@ -3,6 +3,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.sonarqube' version '4.4.1.3373' // ✅ SonarQube plugin added
 }
 
 group = 'com.sjprogramming.restapi'
@@ -36,3 +37,11 @@ jacocoTestReport {
     }
 }
 
+sonarqube {
+    properties {
+        property "sonar.projectKey", "springboot-gradle-vuln"
+        property "sonar.projectName", "springboot-gradle-vuln"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.login", "squ_2ec5731f7c966cf7e363e21b7c6af125841807eb"
+    }
+}
