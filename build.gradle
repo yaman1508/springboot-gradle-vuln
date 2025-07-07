@@ -1,9 +1,7 @@
 plugins {
     id 'java'
-    id 'jacoco'
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.4'
-    id 'org.sonarqube' version '4.4.1.3373'
     id 'org.owasp.dependencycheck' version '12.1.0'
 }
 
@@ -35,19 +33,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
-
-jacoco {
-    toolVersion = "0.8.10"
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
 }
 
 // ✅ OWASP Dependency Check
@@ -57,20 +42,6 @@ dependencyCheck {
 
     analyzers {
         nodeAuditEnabled = false
-    }
-}
-
-// ✅ SonarQube Configuration
-sonarqube {
-    properties {
-        property "sonar.projectKey", "springboot-gradle-vuln"
-        property "sonar.projectName", "springboot-gradle-vuln"
-        property "sonar.host.url", "http://localhost:9000"
-        property "sonar.login", "squ_f51f30159312a89e75d87cb59115429649755271"
-        property "sonar.gradle.skipCompile", "true"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.dependencyCheck.reportPath", "build/reports/dependency-check-report.xml"
-        property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
 }
 
