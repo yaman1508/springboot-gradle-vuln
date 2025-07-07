@@ -4,7 +4,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.sonarqube' version '4.4.1.3373'
-    id 'org.owasp.dependencycheck' version '12.1.0'
+    id 'org.owasp.dependencycheck' version '8.4.0'
 }
 
 group = 'com.sjprogramming.restapi'
@@ -17,19 +17,22 @@ repositories {
 }
 
 dependencies {
+    // ✅ Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
-    // Vulnerable libraries (for demo / scan purposes)
+    // ✅ VULNERABLE DEPENDENCIES (for OWASP scan testing)
     implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
     implementation 'commons-collections:commons-collections:3.2.1'
     implementation 'org.apache.struts:struts2-core:2.5.20'
 
+    // ✅ Runtime & Dev
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.32'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 
+    // ✅ Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
@@ -50,37 +53,28 @@ jacocoTestReport {
     }
 }
 
+// ✅ OWASP Dependency-Check Configuration
 dependencyCheck {
-    formats = ['XML', 'JSON'] // Only supported formats
-    failBuildOnCVSS = 0       // Don't fail build on CVSS (for demo)
-    autoUpdate = true
-   // cveValidForHours = 24
+    format = 'ALL'
+    // Optional suppression file
+    // suppressionFile = 'owasp-suppressions.xml'
+    failBuildOnCVSS = 0
 
     analyzers {
-        assemblyEnabled = false
-        nuspecEnabled = false
-        nugetconfEnabled = false
-        bundleAuditEnabled = false
-        pyDistributionEnabled = false
-        pyPackageEnabled = false
-        rubygemsEnabled = false
-        opensslEnabled = false
-        cmakeEnabled = false
-        autoconfEnabled = false
-        composerEnabled = false
-        nodeEnabled = false
         nodeAuditEnabled = false
-        retirejs = [enabled: false]
     }
 }
 
+// ✅ SonarQube Configuration
 sonarqube {
     properties {
         property "sonar.projectKey", "springboot-gradle-vuln"
         property "sonar.projectName", "springboot-gradle-vuln"
         property "sonar.host.url", "http://localhost:9000"
-        property "sonar.login", "squ_2ec5731f7c966cf7e363e21b7c6af125841807eb"
+        property "sonar.login", "squ_f51f30159312a89e75d87cb59115429649755271"
         property "sonar.gradle.skipCompile", "true"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.dependencyCheck.reportPath", "build/reports/dependency-check-report.xml"
+        property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
 }
