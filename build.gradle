@@ -8,7 +8,11 @@ plugins {
 group = 'com.sjprogramming.restapi'
 version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
-sourceCompatibility = '17'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
@@ -35,7 +39,6 @@ test {
     useJUnitPlatform()
 }
 
-// ✅ OWASP Dependency Check
 dependencyCheck {
     format = 'ALL'
     failBuildOnCVSS = 11 // Build won't fail on vulnerabilities
@@ -45,7 +48,6 @@ dependencyCheck {
     }
 }
 
-// ✅ Global Gradle settings (outside any block)
 allprojects {
     tasks.withType(JavaCompile).configureEach {
         options.compilerArgs += ["-Xlint:none"]
